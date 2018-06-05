@@ -25,6 +25,10 @@ import br.unb.dali.models.agg.uml.sd.Lifeline;
  * @author Pedro
  */
 public class DiagramBuilder {
+	
+    private StringBuilder resultadoPrograma = new StringBuilder();
+	
+	public String getResultadoPrograma(){ return resultadoPrograma.toString();}
 
 	// TODO Build multiple diagrams. Will need to use the references inside the
 	// XMI file.
@@ -70,6 +74,7 @@ public class DiagramBuilder {
 
 				default:
 					System.out.println("Diagram type not found.");
+					resultadoPrograma.append("Diagram type not found.");
 					break;
 				}
 				break;
@@ -118,6 +123,8 @@ public class DiagramBuilder {
 
 					default:
 						System.out.println("Node type not found: "
+								+ me.getPlainAttribute("type"));
+						resultadoPrograma.append("Node type not found: "
 								+ me.getPlainAttribute("type"));
 						break;
 					}
@@ -222,6 +229,9 @@ public class DiagramBuilder {
 			}
 		} catch (Exception e) {
 			System.out.println("Could not get probability from "
+					+ me.getPlainAttribute("type") + " ID: [" + me.getXMIID()
+					+ "]");
+			resultadoPrograma.append("Could not get probability from "
 					+ me.getPlainAttribute("type") + " ID: [" + me.getXMIID()
 					+ "]");
 		}

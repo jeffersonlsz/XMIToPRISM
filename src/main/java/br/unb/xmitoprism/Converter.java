@@ -1,6 +1,7 @@
 package br.unb.xmitoprism;
 
 import br.unb.dali.models.agg.AbstractAggModel;
+import br.unb.dali.models.agg.exceptions.ModelSemanticsVerificationException;
 import br.unb.dali.models.agg.uml.ActivityDiagram;
 import br.unb.dali.models.agg.uml.SequenceDiagram;
 import br.unb.dali.util.prism.PRISMModel;
@@ -22,7 +23,12 @@ import br.unb.xmitoprism.util.TimeUtil;
 public class Converter {
 
 	private double conversionTimeMilli = 0;
+	private StringBuilder resultadoConversor = new StringBuilder();
 
+    public String getPrismResult(){
+		
+		return resultadoConversor.toString();
+	}
 	/**
 	 * Calls the main steps in the conversion process. Builds the model, parses
 	 * the XMI file, builds a PRISMModel and calls the output generator.
@@ -39,13 +45,24 @@ public class Converter {
 		mb.buildSdmetricsModel(xmiFile);
 		AbstractAggModel aggModel = db.buildAggModel(mb.getMetaModel(),
 				mb.getModel());
+		resultadoConversor.append(db.getResultadoPrograma());
 
 		boolean conversionResult = false;
 		if (aggModel != null) {
-			PRISMModel prismModel = convertToPRISM(aggModel);
+			PRISMModel prismModel = null;
+			
+			try{
+				 prismModel = convertToPRISM(aggModel);
+				 
+			}catch(ModelSemanticsVerificationException e){
+				resultadoConversor.append(e.getMessage());
+			}
+			
+			
 			if (prismModel != null) {
 				conversionResult = true;
 				FileUtil fu = new FileUtil();
+				resultadoConversor.append(prismModel.toString());
 				fu.writePrismFile(prismModel.toString(), xmiFile);
 			}
 		}
@@ -81,6 +98,7 @@ public class Converter {
 			conversionTimeMilli = TimeUtil.getTimeMilli(startTime, finishTime);
 		} catch (Exception e) {
 			e.printStackTrace();
+			resultadoConversor.append(e.getMessage() + "\n" + e.getCause());
 		}
 		return prismModel;
 	}
